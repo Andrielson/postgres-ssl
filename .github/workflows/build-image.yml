@@ -33,10 +33,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract lowercase repository name
+        id: extract_repository_name
+        run: |
+          repository_name=${{ github.repository }}
+          repository_name=${repository_name,,}
+          echo "repository_name=${repository_name}" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Build and Publish
         uses: docker/build-push-action@v5
         with:
           file: Dockerfile
           platforms: linux/arm64, linux/amd64
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ghcr.io/${{ steps.extract_repository_name.outputs.repository_name }}:latest
